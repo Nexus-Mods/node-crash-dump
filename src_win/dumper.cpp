@@ -59,9 +59,11 @@ void createMiniDump(std::ofstream &logFile, PEXCEPTION_POINTERS exceptionPtrs)
 }
 
 bool DoIgnore(DWORD code) {
+  // list of exceptions that I'm fairly confident are not caused by user code
   return (code == 0x80010012)  // some COM errors, seem to be windows internal
       || (code == 0x80010108)
       || (code == 0x8001010d)
+      || (code == 0x800706b5)
       || (code == 0xe06d7363)  // cpp exception
       || (code == 0xe0434352)  // c# exception
   ;
@@ -69,8 +71,8 @@ bool DoIgnore(DWORD code) {
 
 LONG WINAPI VEHandler(PEXCEPTION_POINTERS exceptionPtrs)
 {
-  if (   (exceptionPtrs->ExceptionRecord->ExceptionCode  < 0x80000000)      // non-critical
-      || DoIgnore(exceptionPtrs->ExceptionRecord->ExceptionCode)) {   // c# exception
+  if (   (exceptionPtrs->ExceptionRecord->ExceptionCode  < 0x80000000)  // non-critical
+      || DoIgnore(exceptionPtrs->ExceptionRecord->ExceptionCode)) {
     // don't report non-critical exceptions
     return EXCEPTION_CONTINUE_SEARCH;
   }
