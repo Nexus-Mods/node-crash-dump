@@ -63,7 +63,11 @@ bool DoIgnore(DWORD code) {
   return (code == 0x80010012)  // some COM errors, seem to be windows internal
       || (code == 0x80010108)
       || (code == 0x8001010d)
+      || (code == 0x80004035)
+      || (code == 0x80040155)
+      || (code == 0x800401fd)
       || (code == 0x800706b5)
+      || (code == 0x800706ba)
       || (code == 0xe06d7363)  // cpp exception
       || (code == 0xe0434352)  // c# exception
   ;
