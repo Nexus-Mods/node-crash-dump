@@ -5,8 +5,12 @@
             "includes": [
                 "auto.gypi"
             ],
-            "sources": [
-                "src_win/dumper.cpp"
+            "conditions": [
+                ['OS=="win"', {
+                    "sources": [
+                        "src_win/dumper.cpp"
+                    ],
+                }]
             ],
             "include_dirs": [
             ],
