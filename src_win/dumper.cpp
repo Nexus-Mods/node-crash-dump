@@ -41,20 +41,20 @@ void createMiniDump(std::ofstream &logFile, PEXCEPTION_POINTERS exceptionPtrs)
         BOOL success = funcDump(::GetCurrentProcess(), ::GetCurrentProcessId(), dumpFile, MiniDumpNormal,
                                 &exceptionInfo, nullptr, nullptr);
         if (!success) { 
-          logFile << "failed to write dump: " << ::GetLastError() << std::endl;
+          logFile << "failed to write dump: " << std::hex << ::GetLastError() << std::dec << std::endl;
         } else {
           logFile << "success" << std::endl;
         }
         ::CloseHandle(dumpFile);
       } else {
-        logFile << "failed to create dmp file: " << ::GetLastError() << std::endl;
+        logFile << "failed to create dmp file: " << std::hex << ::GetLastError() << std::dec << std::endl;
       }
     } else {
       logFile << "wrong version of dbghelp.dll" << std::endl;
     }
     ::FreeLibrary(dbgDLL);
   } else {
-    logFile << "dbghelp.dll not loaded: " << ::GetLastError() << std::endl;
+    logFile << "dbghelp.dll not loaded: " << std::hex << ::GetLastError() << std::dec << std::endl;
   }
 }
 
@@ -63,6 +63,7 @@ bool DoIgnore(DWORD code) {
   return (code == 0x80010012)  // some COM errors, seem to be windows internal
       || (code == 0x80010108)
       || (code == 0x8001010d)
+      || (code == 0x8001010e)
       || (code == 0x80004035)
       || (code == 0x80040155)
       || (code == 0x800401fd)
