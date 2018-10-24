@@ -1,10 +1,9 @@
-function init(dmpPath) {
-  if (process.platform === 'win32') {
-    let windump = require('./build/Release/windump');
-    windump.init(dmpPath);
-  } // not implemented on other platforms yet
-}
+const MODULE_PATH = './build/Release/windump';
 
-module.exports = {
-  default: init,
-}
+const lib = process.platform === 'win32' ? require(MODULE_PATH) : {
+  init: () => undefined,
+};
+
+lib.default = lib.init;
+
+module.exports = lib;

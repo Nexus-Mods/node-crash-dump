@@ -69,9 +69,16 @@ bool DoIgnore(DWORD code) {
       || (code == 0x800401fd)
       || (code == 0x800706b5)
       || (code == 0x800706ba)
-      || (code == 0xe06d7363)  // cpp exception
+      || (code == 0xe06d7363)  // cpp exception (could be handled)
       || (code == 0xe0434352)  // c# exception
   ;
+}
+
+void openLogFile(std::ofstream &logFile, PEXCEPTION_POINTERS exceptionPtrs) {
+  logFile.open((dmpPath + ".log").c_str(), std::fstream::out | std::fstream::app);
+  logFile << "Exception time: " << time(nullptr) << std::endl;
+  logFile << "Exception code: " << std::hex << exceptionPtrs->ExceptionRecord->ExceptionCode << std::dec << std::endl;
+  logFile << "Exception address: " << std::hex << exceptionPtrs->ExceptionRecord->ExceptionAddress << std::dec << std::endl;
 }
 
 LONG WINAPI VEHandler(PEXCEPTION_POINTERS exceptionPtrs)
@@ -82,17 +89,8 @@ LONG WINAPI VEHandler(PEXCEPTION_POINTERS exceptionPtrs)
     return EXCEPTION_CONTINUE_SEARCH;
   }
 
-  if (exceptionPtrs->ExceptionRecord->ExceptionFlags != EXCEPTION_NONCONTINUABLE) {
-    // we don't want to log continuable exceptions
-    return EXCEPTION_CONTINUE_SEARCH;
-  }
-
   std::ofstream logFile;
-  logFile.open((dmpPath + ".log").c_str(), std::fstream::out | std::fstream::app);
-  logFile << "Exception time: " << time(nullptr) << std::endl;
-  logFile << "Exception code: " << std::hex << exceptionPtrs->ExceptionRecord->ExceptionCode << std::dec << std::endl;
-  logFile << "Exception address: " << std::hex << exceptionPtrs->ExceptionRecord->ExceptionAddress << std::dec << std::endl;
-
+  openLogFile(logFile, exceptionPtrs);
   createMiniDump(logFile, exceptionPtrs);
 
   return EXCEPTION_CONTINUE_SEARCH;
