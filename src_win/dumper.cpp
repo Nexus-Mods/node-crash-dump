@@ -15,6 +15,7 @@ PVOID exceptionHandler = nullptr;
 
 std::string dmpPath;
 std::wstring dmpPathW;
+bool writing = false;
 
 void createMiniDump(std::ofstream &logFile, PEXCEPTION_POINTERS exceptionPtrs)
 {
@@ -89,9 +90,14 @@ LONG WINAPI VEHandler(PEXCEPTION_POINTERS exceptionPtrs)
     return EXCEPTION_CONTINUE_SEARCH;
   }
 
-  std::ofstream logFile;
-  openLogFile(logFile, exceptionPtrs);
-  createMiniDump(logFile, exceptionPtrs);
+  // avoid loop
+  if (!writing) {
+    writing = true;
+    std::ofstream logFile;
+    openLogFile(logFile, exceptionPtrs);
+    createMiniDump(logFile, exceptionPtrs);
+    writing = false;
+  }
 
   return EXCEPTION_CONTINUE_SEARCH;
 }
