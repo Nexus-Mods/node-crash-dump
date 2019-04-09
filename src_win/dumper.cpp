@@ -113,6 +113,10 @@ NAN_METHOD(init) {
   }
 }
 
+NAN_METHOD(deinit) {
+  ::RemoveVectoredExceptionHandler(exceptionHandler);
+}
+
 NAN_METHOD(crash) {
   *(char*)0 = 0;
 }
@@ -120,6 +124,8 @@ NAN_METHOD(crash) {
 NAN_MODULE_INIT(Init) {
   Nan::Set(target, New<String>("init").ToLocalChecked(),
     GetFunction(New<FunctionTemplate>(init)).ToLocalChecked());
+  Nan::Set(target, New<String>("deinit").ToLocalChecked(),
+    GetFunction(New<FunctionTemplate>(deinit)).ToLocalChecked());
   Nan::Set(target, New<String>("crash").ToLocalChecked(),
     GetFunction(New<FunctionTemplate>(crash)).ToLocalChecked());
 }
