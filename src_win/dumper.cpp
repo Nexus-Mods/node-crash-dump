@@ -103,7 +103,7 @@ LONG WINAPI VEHandler(PEXCEPTION_POINTERS exceptionPtrs)
 }
 
 NAN_METHOD(init) {
-  String::Utf8Value path(info[0]->ToString());
+  String::Utf8Value path(info.GetIsolate(), info[0]);
 
   dmpPath = *path;
   dmpPathW = toWC(*path, CodePage::UTF8, path.length());
