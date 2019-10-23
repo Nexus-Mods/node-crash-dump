@@ -96,6 +96,22 @@ LONG WINAPI VEHandler(PEXCEPTION_POINTERS exceptionPtrs)
     std::ofstream logFile;
     openLogFile(logFile, exceptionPtrs);
     createMiniDump(logFile, exceptionPtrs);
+
+    Isolate *isolate = Isolate::GetCurrent();
+    if (isolate != nullptr) {
+      logFile << "Javascript stack:" << std::endl;
+      Local<StackTrace> stack = StackTrace::CurrentStackTrace(isolate, 20);
+      for (int i = 0; i < stack->GetFrameCount(); ++i) {
+        Local<StackFrame> frame = stack->GetFrame(isolate, i);
+        String::Utf8Value funcName(isolate, frame->GetFunctionName());
+
+        logFile  << "  " << *funcName << " (" << frame->GetLineNumber() << ":" << frame->GetColumn() << ")" << std::endl;
+      }
+    }
+    else {
+      logFile << "No Javascript stack" << std::endl;
+    }
+
     writing = false;
   }
 
