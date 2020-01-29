@@ -70,6 +70,8 @@ bool DoIgnore(DWORD code) {
       || (code == 0x800401fd)
       || (code == 0x800706b5)
       || (code == 0x800706ba)
+      || (code == 0x800706be)  // something about rpc
+      || (code == 0x80320012)  // timeout. Seems to happen in dns resolution
       || (code == 0xe06d7363)  // cpp exception (could be handled)
       || (code == 0xe0434352)  // c# exception
   ;
