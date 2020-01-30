@@ -148,4 +148,9 @@ NAN_MODULE_INIT(Init) {
     GetFunction(New<FunctionTemplate>(crash)).ToLocalChecked());
 }
 
+#if NODE_MAJOR_VERSION >= 10
+NAN_MODULE_WORKER_ENABLED(dumper, Init)
+#else
 NODE_MODULE(dumper, Init)
+#endif
+
