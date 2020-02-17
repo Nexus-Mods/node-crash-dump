@@ -72,6 +72,8 @@ bool DoIgnore(DWORD code) {
       || (code == 0x800706ba)
       || (code == 0x800706be)  // something about rpc
       || (code == 0x80320012)  // timeout. Seems to happen in dns resolution
+      || (code == 0xe0000001)  // seem to always be connected to msxml5/msxml6 and doesn't have any notable
+      || (code == 0xe0000002)  //   impact on the user so probably handled internally
       || (code == 0xe06d7363)  // cpp exception (could be handled)
       || (code == 0xe0434352)  // c# exception
   ;
