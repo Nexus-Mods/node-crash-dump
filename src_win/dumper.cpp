@@ -62,6 +62,7 @@ void createMiniDump(std::ofstream &logFile, PEXCEPTION_POINTERS exceptionPtrs)
 bool DoIgnore(DWORD code) {
   // list of exceptions that I'm fairly confident are not caused by user code
   return (code == 0x80010012)  // some COM errors, seem to be windows internal
+      || (code == 0x80010105)
       || (code == 0x80010108)
       || (code == 0x8001010d)
       || (code == 0x8001010e)
