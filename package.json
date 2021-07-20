@@ -1,6 +1,6 @@
 {
   "name": "crash-dump",
-  "version": "1.2.6",
+  "version": "2.0.0",
   "description": "Create a mini dump when the application crashes.",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,7 @@
   "dependencies": {
     "autogypi": "^0.2.2",
     "minimist": "^1.2.3",
-    "nan": "^2.14.0",
+    "node-addon-api": "^4.0.0",
     "node-gyp": "^6.0.1"
   }
 }

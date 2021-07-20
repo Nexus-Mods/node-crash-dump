@@ -3,13 +3,11 @@
 #include <windows.h>
 #include <DbgHelp.h>
 #include <string>
-#include <nan.h>
+#include <napi.h>
 #include <fstream>
 #include <ctime>
 #include "string_cast.h"
 
-using namespace Nan;
-using namespace v8;
 
 PVOID exceptionHandler = nullptr;
 
@@ -102,58 +100,38 @@ LONG WINAPI VEHandler(PEXCEPTION_POINTERS exceptionPtrs)
     openLogFile(logFile, exceptionPtrs);
     createMiniDump(logFile, exceptionPtrs);
 
-    Isolate *isolate = Isolate::GetCurrent();
-    if (isolate != nullptr) {
-      logFile << "Javascript stack:" << std::endl;
-      Local<StackTrace> stack = StackTrace::CurrentStackTrace(isolate, 20);
-      for (int i = 0; i < stack->GetFrameCount(); ++i) {
-        Local<StackFrame> frame = stack->GetFrame(isolate, i);
-        String::Utf8Value funcName(isolate, frame->GetFunctionName());
-
-        logFile  << "  " << *funcName << " (" << frame->GetLineNumber() << ":" << frame->GetColumn() << ")" << std::endl;
-      }
-    }
-    else {
-      logFile << "No Javascript stack" << std::endl;
-    }
-
     writing = false;
   }
 
   return EXCEPTION_CONTINUE_SEARCH;
 }
 
-NAN_METHOD(init) {
-  String::Utf8Value path(info.GetIsolate(), info[0]);
-
-  dmpPath = *path;
-  dmpPathW = toWC(*path, CodePage::UTF8, path.length());
+Napi::Value init(const Napi::CallbackInfo &info) {
+  dmpPath = info[0].ToString();
+  dmpPathW = toWC(dmpPath.c_str(), CodePage::UTF8, dmpPath.size());
 
   if (exceptionHandler == nullptr) {
     exceptionHandler = ::AddVectoredExceptionHandler(0, VEHandler);
   }
+  return info.Env().Undefined();
 }
 
-NAN_METHOD(deinit) {
+Napi::Value deinit(const Napi::CallbackInfo &info) {
   ::RemoveVectoredExceptionHandler(exceptionHandler);
+  return info.Env().Undefined();
 }
 
-NAN_METHOD(crash) {
+Napi::Value crash(const Napi::CallbackInfo &info) {
   *(char*)0 = 0;
+  return info.Env().Undefined();
 }
 
-NAN_MODULE_INIT(Init) {
-  Nan::Set(target, New<String>("init").ToLocalChecked(),
-    GetFunction(New<FunctionTemplate>(init)).ToLocalChecked());
-  Nan::Set(target, New<String>("deinit").ToLocalChecked(),
-    GetFunction(New<FunctionTemplate>(deinit)).ToLocalChecked());
-  Nan::Set(target, New<String>("crash").ToLocalChecked(),
-    GetFunction(New<FunctionTemplate>(crash)).ToLocalChecked());
+Napi::Object InitAll(Napi::Env env, Napi::Object exports) {
+  exports.Set("init", Napi::Function::New(env, init));
+  exports.Set("deinit", Napi::Function::New(env, deinit));
+  exports.Set("crash", Napi::Function::New(env, crash));
+  return exports;
 }
 
-#if NODE_MAJOR_VERSION >= 10
-NAN_MODULE_WORKER_ENABLED(dumper, Init)
-#else
-NODE_MODULE(dumper, Init)
-#endif
+NODE_API_MODULE(CrashDump, InitAll)
 
