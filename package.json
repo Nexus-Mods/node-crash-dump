@@ -13,7 +13,9 @@
     "install": "prebuild-install -r napi -t 4 -a x64 || node-gyp rebuild"
   },
   "binary": {
-    "napi_versions": [4]
+    "napi_versions": [
+      4
+    ]
   },
   "author": "Black Tree Gaming Ltd",
   "license": "GPL-3.0",
