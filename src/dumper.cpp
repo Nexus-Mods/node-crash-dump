@@ -1,12 +1,13 @@
-#define WIN32_LEAN_AND_MEAN
-
-#include <windows.h>
-#include <DbgHelp.h>
-#include <string>
 #include <napi.h>
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <string>
 #include <fstream>
 #include <ctime>
+
 #include "string_cast.h"
+#include <windows.h>
+#include <DbgHelp.h>
 
 
 PVOID exceptionHandler = nullptr;
@@ -39,7 +40,7 @@ void createMiniDump(std::ofstream &logFile, PEXCEPTION_POINTERS exceptionPtrs)
 
         BOOL success = funcDump(::GetCurrentProcess(), ::GetCurrentProcessId(), dumpFile, MiniDumpNormal,
                                 &exceptionInfo, nullptr, nullptr);
-        if (!success) { 
+        if (!success) {
           logFile << "failed to write dump: " << std::hex << ::GetLastError() << std::dec << std::endl;
         } else {
           logFile << "success" << std::endl;
@@ -105,24 +106,31 @@ LONG WINAPI VEHandler(PEXCEPTION_POINTERS exceptionPtrs)
 
   return EXCEPTION_CONTINUE_SEARCH;
 }
+#endif
 
 Napi::Value init(const Napi::CallbackInfo &info) {
+  #ifdef _WIN32
   dmpPath = info[0].ToString();
   dmpPathW = toWC(dmpPath.c_str(), CodePage::UTF8, dmpPath.size());
 
   if (exceptionHandler == nullptr) {
     exceptionHandler = ::AddVectoredExceptionHandler(0, VEHandler);
   }
+  #endif
   return info.Env().Undefined();
 }
 
 Napi::Value deinit(const Napi::CallbackInfo &info) {
+  #ifdef _WIN32
   ::RemoveVectoredExceptionHandler(exceptionHandler);
+  #endif
   return info.Env().Undefined();
 }
 
 Napi::Value crash(const Napi::CallbackInfo &info) {
+  #ifdef _WIN32
   *(char*)0 = 0;
+  #endif
   return info.Env().Undefined();
 }
 

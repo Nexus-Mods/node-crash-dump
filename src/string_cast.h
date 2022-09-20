@@ -1,3 +1,4 @@
+#ifdef _WIN32
 #pragma once
 
 #include <string>
@@ -77,3 +78,4 @@ static std::string toMB(const wchar_t * const &source, CodePage codePage, size_t
 
   return result;
 }
+#endif
