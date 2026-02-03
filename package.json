@@ -1,6 +1,6 @@
 {
   "name": "crash-dump",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Create a mini dump when the application crashes.",
   "main": "index.js",
   "repository": {
